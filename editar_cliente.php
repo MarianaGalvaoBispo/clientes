@@ -1,96 +1,102 @@
+<?php
+function limpar_texto($str){
+    return preg_replace("/[^0-9]/", "", $str);
+}
 
-<?php 
-include('conexao.php');
-$id= intval($_GET['id']); 
+$erros = array();
 
-function limpar_texto($str){ 
-    return preg_replace("/[^0-9]/", "", $str); 
-  }
-  
-$erro = false;
-if(isset($_POST['enviar'])){
-
-
+if (isset($_POST['enviar'])) {
+    include('conexao.php');
+    
     $nome = $_POST['nome'];
     $email = $_POST['email'];
     $telefone = $_POST['telefone'];
     $data_nascimento = $_POST['data_nascimento'];
+    $grupo = $_POST['grupo'];
 
-    if (empty($nome)){
-        $erro = "Preencha o nome";
+    if (empty($nome)) {
+        $erros[] = "Preencha o nome";
     }
-    if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)){
-        $erro = "Preencha o e-mail";
+    if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $erros[] = "Preencha um e-mail válido";
     }
-    if ($erro) {
-        echo $erro;
-    } else {
-        if (!empty($data_nascimento)){      
-            $pedacos = explode('/', $data_nascimento);
-            if (count($pedacos)==3) {
-                $data_nascimento = implode('-', array_reverse($pedacos));
+    if (empty($grupo)) {
+        $erros[] = "Preencha o grupo";
+    }
 
-            } else {
-                $erro = "A data de dascimento deve ser dia/mês/ano.";
-            }
-        }
-        if(!empty($telefone)){
-            $telefone= limpar_texto($telefone);
-        }
-        if($erro){
-            echo "Erro: $erro ";
+    if (!empty($data_nascimento)) {
+        $pedacos = explode('/', $data_nascimento);
+        if (count($pedacos) == 3) {
+            $data_nascimento = implode('-', array_reverse($pedacos));
         } else {
-            $sql_code = "UPDATE clientes
-            SET nome='$nome',
-            email='$email',
-            telefone='$telefone',
-            data_nascimento='$data_nascimento'
-            WHERE id = '$id'";
-            $deu_certo= $mysqli->query($sql_code) or die($mysqli->error);
-            if($deu_certo){
-                echo "Cliente atualizado com sucesso";
-                unset($_POST);
-            }
+            $erros[] = "A data de nascimento deve estar no formato dia/mês/ano.";
+        }
+    }
+
+    if (!empty($telefone)) {
+        $telefone = limpar_texto($telefone);
+    }
+
+    if (!empty($erros)) {
+        foreach ($erros as $erro) {
+            echo "Erro: $erro<br>";
+        }
+    } else {
+        $sql_code = "INSERT INTO clientes (nome, email, telefone, data_nascimento, grupo) 
+        VALUES ('$nome', '$email', '$telefone', '$data_nascimento', '$grupo')";
+
+        $deu_certo = $mysqli->query($sql_code) or die($mysqli->error);
+
+        if ($deu_certo) {
+            echo "Cliente editado com sucesso";
+            unset($_POST);
         }
     }
 }
-$sql_cliente = "SELECT * FROM clientes WHERE id = '$id'"; //para pegar apenas o id escolhido
-$query_cliente = $mysqli->query($sql_cliente) or die($mysqli->error);
-$cliente = $query_cliente->fetch_assoc();
 ?>
+
 
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editar o cliente</title>
+    <title>Edição cliente</title>
+    <link rel="stylesheet" href="style.css">
 
 </head>
 <body>
+    <div class="navbar">
+    <a class="./index.php" href="#Início">Cadastro de cliente</a>
+    <a href="./clientes.php">Lista de clientes</a>
+    </div>
+    <h1 class="main_tittle">Edição do cliente</h1>
     <form action="" method="post">
-        <a href="./clientes.php">Voltar para a lista</a>
-        <br><br>
-        <p>
-            <label>Nome:</label>
-            <input value="<?php echo $cliente['nome']; ?>" type="text" name="nome" id="">
-        </p>
-        <p>
-
-            <label>E-mail:</label>
-            <input value="<?php echo $cliente['email']; ?>" type="text" name="email" id="">
-        </p>
-        <p>
-
-        </p>
-            <label>Telefone:</label>
-            <input value="<?php if(!empty($cliente['telefone'])) echo formatar_telefone($cliente['telefone']); ?>"placeholder="(11)99999-9999" type="text" name="telefone" id="">
-        <p>
-            <label>Data de nascimento:</label>
-            <input value="<?php if(!empty($cliente['data_nascimento'])) echo formatar_data($cliente['data_nascimento']); ?>" type="text" name="data_nascimento" id="">
-        </p>
-        <br><br>
-        <button type="submit" name="enviar">Enviar</button>
+    <div class= "align">
+    <form action="" method="post">
+        <div class="label">   
+            <label>Nome:</label> 
+            <input class="input" value="<?php if(isset($_POST['nome'])) echo $_POST['nome']; ?>" type="text" name="nome" id="">
+        </div>
+        <div class="label">
+            <label>E-mail:</label>    
+            <input class="input" value="<?php if(isset($_POST['email'])) echo $_POST['email']; ?>" type="text" name="email" id="">
+        </div>
+        <div class="label">
+            <label>telefone:</label>
+            <input class="input" value="<?php if(isset($_POST['telefone'])) echo $_POST['telefone']; ?>" type="text" name="telefone" id="">
+        </div>
+        <div class="label">
+            <label>data de nascimento:</label>
+            <input class="input" value="<?php if(isset($_POST['data_nascimento'])) echo $_POST['data_nascimento']; ?>" type="text" name="data_nascimento" id="">
+        </div>
+        <div class="label">
+            <label>Grupo:</label>
+            <input class="input" value="<?php if(isset($_POST['grupo'])) echo $_POST['grupo']; ?>" type="text" name="grupo" id="">
+        </div>
+        <div class="btn">
+            <button class= "btnEnviar"class="submit" name="enviar">Enviar</button>
+        </div>
     </form>
 </body>
 </html>

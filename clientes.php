@@ -23,17 +23,6 @@ $num_clientes = $query_clientes->num_rows;
     </div>
     <h1>Lista de clientes</h1>
     <p>Estes são os clientes cadastrados no seu sistema</p>
-    <form method="post">
-        <label for="filtro">Filtrar por grupo:</label>
-        <select name="filtro" id="filtro">
-            <option value="">Todos</option>
-            <option value="Bronze">Bronze</option>
-            <option value="Prata">Prata</option>
-            <option value="Ouro">Ouro</option>
-            <option value="Diamante">Diamante</option>
-        </select>
-        <button type="submit">Filtrar</button>
-    </form>
     <table class= "customers">
         <thead> 
             <th>ID</th>
@@ -45,8 +34,7 @@ $num_clientes = $query_clientes->num_rows;
 
         </thead>
         <tbody>
-            <?php 
-            if($num_clientes == 0) { ?>
+            <?php if($num_clientes == 0) { ?>
                 <tr>
                     <td colspan="7">Nunhum cliente foi cadastrados</td> 
                 </tr>
