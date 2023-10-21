@@ -12,6 +12,13 @@ if ($mysqli->connect_errno){
 function formatar_data($data){
     return implode ('/', array_reverse(explode('-',$data)));
 }
+function calcularIdade($data_nascimento) {
+    $data_nascimento = DateTime::createFromFormat('d/m/Y', $data_nascimento);
+    $data_atual = new DateTime();
+    $intervalo = $data_nascimento->diff($data_atual);
+    return $intervalo->y;
+}
+
 function formatar_telefone($telefone){
     $ddd= substr ($telefone,0,2);
     $parte1=substr ($telefone,0,5);

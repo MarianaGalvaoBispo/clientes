@@ -14,22 +14,39 @@ $num_clientes = $query_clientes->num_rows;
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lista de cliente</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div class="navbar">
+    <a href="./index.php">Cadastro de cliente</a>
+    <a class= "active" href="#Lista">Lista de clientes</a>
+    </div>
     <h1>Lista de clientes</h1>
     <p>Estes são os clientes cadastrados no seu sistema</p>
-    <table border="1" celpadding="10">
-        <thead>
+    <form method="post">
+        <label for="filtro">Filtrar por grupo:</label>
+        <select name="filtro" id="filtro">
+            <option value="">Todos</option>
+            <option value="Bronze">Bronze</option>
+            <option value="Prata">Prata</option>
+            <option value="Ouro">Ouro</option>
+            <option value="Diamante">Diamante</option>
+        </select>
+        <button type="submit">Filtrar</button>
+    </form>
+    <table class= "customers">
+        <thead> 
             <th>ID</th>
-            <TH>Nome</TH>
+            <th>Nome</th>
             <th>E-mail</th>
-            <TH>telefone</TH>
-            <TH>Nascimento</TH>
-            <th>data de cadastro</th>
-            <TH>Ações</TH>
+            <th>telefone</th>
+            <th>idade</th>
+            <th>Grupo</th>
+
         </thead>
         <tbody>
-            <?php if($num_clientes == 0) { ?>
+            <?php 
+            if($num_clientes == 0) { ?>
                 <tr>
                     <td colspan="7">Nunhum cliente foi cadastrados</td> 
                 </tr>
@@ -40,26 +57,23 @@ $num_clientes = $query_clientes->num_rows;
                     if(!empty($cliente['telefone'])){
                         $telefone=formatar_telefone($cliente['telefone']);
                     }
-                    $data_nascimento = "Não informado";  //arrumando a data
+                    $data_nascimento = "Não informado";  //arrumando a data para idade
                     if(!empty($cliente['data_nascimento'])){
-                        $data_nascimento = implode('/', array_reverse(explode('-', $cliente['data_nascimento'])));
-                    }
-                    $data_cadastro= date("d/m/Y H:i", strtotime($cliente['data_cadastro']));   //arrumando a datatime
-                    
+                    $data_nascimento_formatada = implode('/', array_reverse(explode('-', $cliente['data_nascimento'])));
+                    $idade = calcularIdade($data_nascimento_formatada);
+                    }                    
                     ?> 
             <tr>
                 <td><?php echo $cliente['id']?></td>
                 <td><?php echo $cliente['nome']?></td>
                 <td><?php echo $cliente['email']?></td>
                 <td><?php echo $telefone;?></td>
-                <td><?php echo $data_nascimento;?></td>
-                <td><?php echo $cliente['data_cadastro']?></td>
+                <td><?php echo $idade;?></td>
+                <td><?php echo $cliente['grupo']?></td>
                 <td>
-                    <a href="editar_cliente.php?id=<?php echo $cliente['id']; ?>">Editar</a>
-                    <a href="deletar_cliente.php?id=<?php echo $cliente['id']; ?>">Deletar</a>
+                    <a class="btn_edit" href="editar_cliente.php?id=<?php echo $cliente['id']; ?>">Editar</a>
+                    <a class="btn_delete" href="deletar_cliente.php?id=<?php echo $cliente['id']; ?>">Deletar</a>
                 </td>
-
-
             </tr>            
             <?php
                 }
